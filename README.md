@@ -8,9 +8,13 @@ Ray tracing experiments with C++
 ## Project
 This is a simple implementation of a ray tracing engine in C++. This project is still a work in progress, expect bugs.
 
-The project requires `SDL2` to handle cross platform graphics.
-
 My intention is to register my learnings throughout this project in this repository.
+
+## Thanks to
+| Name | Description |
+| -- | -- |
+| [atdean's SDL2 project templat](https://github.com/atdean/sdl2-cpp-project-template) | Provides a really nice starting template for including SDL2 on CMake |
+| [SDL2](https://www.libsdl.org/) | For handling graphics cross platform |
 
 ## Dev log
 ### Day 0
@@ -31,8 +35,10 @@ After a few side projects in SDL, it's time to start ray tracing!
     <small>Some HighDPI/Retina enabled rendering</small>
 <center>
 </center>
+    <br><br><br><br>
     <img src=".github/day1.gif">
     <small>And some really cool realtime 120fps interaction</small>
+    <br><br><br><br>
 </center>
 
 This was basically the first day. Where I got some basic ray casting working.
