@@ -18,6 +18,10 @@ struct Size {
 
 	Size() : width(0), height(0) { }
 	Size(int width, int height) : width(width), height(height) { }
+
+    operator ImVec2() const {
+        return ImVec2(width, height);
+    }
 };
 
 #define ENABLE_HIGHDPI
@@ -376,7 +380,20 @@ class Engine {
 		// ImGui::ShowDemoWindow();
 
 		ImGui::Render();
+
+        #ifdef ENABLE_HIGHDPI
+        // HACK: Fixes the ImGui issue with the SDLRenderer, where it won't scale according to the monitor dpi
+        float rsx = 1.0f;
+        float rsy = 1.0f;
+        SDL_RenderGetScale(renderer, &rsx, &rsy);
+        SDL_RenderSetScale(renderer, virtualViewport.width / viewport.width, virtualViewport.height / viewport.height);
+        #endif
+
 		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
+        #ifdef ENABLE_HIGHDPI
+        SDL_RenderSetScale(renderer, rsx, rsy);
+        #endif
 	}
 
 	void onRenderOverlay() {
