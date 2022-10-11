@@ -14,7 +14,8 @@ DerivePointerAlignment: false
 PointerAlignment: Left
 AlignConsecutiveAssignments: false
 AlignAfterOpenBracket: BlockIndent
-SpacesInSquareBrackets: true
+BinPackArguments: false
+SpacesInSquareBrackets: false
 AllowShortIfStatementsOnASingleLine: true
 IndentCaseLabels: true
 IndentPPDirectives: BeforeHash
