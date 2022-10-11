@@ -6,4 +6,5 @@ compile_commands.json
 CMakeFiles
 .cache
 build
+bindings
 .DS_Store

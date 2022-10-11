@@ -60,6 +60,10 @@ class Vector3 {
 		const float length = a.length();
 		return Vector3(a.x / length, a.y / length, a.z / length);
 	}
+
+    static float distance(Vector3 a, Vector3 b) {
+        return sqrtf(powf(b.x - a.x, 2.0f) + powf(b.z - a.z, 2.0f) + powf(b.z - a.z, 2.0f));
+    }
 #pragma endregion Static operations
 
 #pragma region Static getters

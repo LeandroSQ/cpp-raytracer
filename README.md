@@ -50,8 +50,14 @@ It seems that doing the operations in the back buffer penalizes performance when
 ### Day 1.5
 Basically a couple of refactoring in the SDL side, experimented with SDL_Surface, writing directly on the window surface, which gained some performance but was lacking some functionality, like HighDPI screen support.
 Fixed that by using a Texture, manipulating the texture pixels and rendering to a Renderer, which preserves the software layer to interact with OpenGL/Metal/Vulkan and whatnot.
+<<<<<<< HEAD
 This proved to be worth the while, frames take as much as 1ms to render, with 3 spheres!
 
 <p align="center">
     <img src=".github/day1.5.png">
 </p>
+=======
+This proved to be worth the while, frames take as much as 1ms to render, with 3 spheres! 
+
+Also added Gamma correction, which looks cool!
+>>>>>>> 04cec5f620241fe28b9ad71a50f51c3eca2e7d54

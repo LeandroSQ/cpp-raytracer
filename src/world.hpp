@@ -18,7 +18,7 @@ class World {
         light = Vector3::normalize(Vector3(-1, -1, -1));
 
         // Setup spheres
-        spheres.push_back(Sphere(Vector3(0, 0, -1), 0.5f, Color(1.0f, 0.0f, 0.0f)));
+        spheres.push_back(Sphere(Vector3(0.0f, 0.0f, -1.5f), 0.5f, Color(1.0f, 0.0f, 0.0f)));
         spheres.push_back(Sphere(Vector3(-1, 1, -1), 0.25f, Color(0.0f, 1.0f, 0.0f)));
         spheres.push_back(Sphere(Vector3(1, -1, -1), 0.25f, Color(0.0f, 0.0f, 1.0f)));
     }

@@ -12,6 +12,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 # https://trenki2.github.io/blog/2017/06/02/using-sdl2-with-cmake/
@@ -30,11 +31,23 @@ project(${PROJECT_NAME})
 # Can also use GLOB_RECURSE
 file(GLOB SOURCES "src/*.cpp")
 
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
 # set(SDL2_INCLUDE_DIRS /Library/Frameworks/SDL2.framework/Headers)
 # set(SDL2_LIBRARIES /Library/Frameworks/SDL2/framework/SDL2)
-find_package(SDL2 REQUIRED)
+# find_package(SDL2 REQUIRED)
 # find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
+# include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+set(BINDINGS
+    # ${CMAKE_CURRENT_SOURCE_DIR}/bindings/imgui_impl_opengl2.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/bindings/imgui_impl_sdl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/bindings/imgui_impl_sdl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/bindings/imgui_impl_sdlrenderer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/bindings/imgui_impl_sdlrenderer.cpp
+)
+# file(GLOB BINDINGS "bindings/*.cpp")
+
+add_executable(${PROJECT_NAME} ${SOURCES} ${BINDINGS})
+target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
