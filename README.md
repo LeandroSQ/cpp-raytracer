@@ -45,3 +45,9 @@ After a few side projects in SDL, it's time to start ray tracing!
 This was basically the first day. Where I got some basic ray casting working.
 
 It seems that doing the operations in the back buffer penalizes performance when setting pixels manually, maybe having a surface and manipulating it manually would provide a better performance, since now the actual ray tracing takes 6ms tops and the back buffer manipulation takes 40ms 😕.
+
+
+### Day 1.5
+Basically a couple of refactoring in the SDL side, experimented with SDL_Surface, writing directly on the window surface, which gained some performance but was lacking some functionality, like HighDPI screen support.
+Fixed that by using a Texture, manipulating the texture pixels and rendering to a Renderer, which preserves the software layer to interact with OpenGL/Metal/Vulkan and whatnot.
+This proved to be worth the while, frames take as much as 1ms to render, with 3 spheres! 
