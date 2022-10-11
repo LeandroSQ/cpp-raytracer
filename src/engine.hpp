@@ -15,7 +15,7 @@ struct Size {
 	Size(int width, int height) : width(width), height(height) { }
 };
 
-// #define ENABLE_HIGHDPI
+#define ENABLE_HIGHDPI
 #define MOUSE_MOVE_LIGHT
 // #define MOUSE_MOVE_SPHERE
 #define DEBUG_FRAME_TIME
@@ -26,9 +26,9 @@ struct Size {
 class Engine {
   public:
 	// Viewport
-	Size viewport = Size(400, 225);
+	Size viewport = Size(800, 450);
 
-	bool isGammaCorrectionEnabled = false;
+	bool isGammaCorrectionEnabled = true;
 
 	bool isRunning = true;
 
