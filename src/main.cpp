@@ -7,13 +7,23 @@
 #include <iostream>
 
 // Definitions
-// #define DEBUG_FRAME_TIME
+#define ENABLE_HIGHDPI
+#define DEBUG_FRAME_TIME
 #define MOUSE_MOVE_LIGHT
 // #define MOUSE_MOVE_SPHERE
 
+#define SDL_HandleError(msg)                                                                                           \
+ std::cout << msg << " " << SDL_GetError() << std::endl;                                                               \
+ return -1;
+#define PIN std::cout << __FILE__ << ":" << __LINE__ << "  -  " << __func__ << std::endl;
+
 // SDL Variables
 SDL_Window* window = nullptr;
-SDL_Renderer* renderer = nullptr;
+SDL_Surface* surface = nullptr;
+SDL_Texture* texture = nullptr;
+
+void* pixels = nullptr;
+int pitch = 0;
 
 // Frame time variables
 uint64_t lastFrameTime = 0;
@@ -26,8 +36,33 @@ int width = 400, height = 225;
 World world;
 
 void setPixel(int x, int y, float r, float g, float b) {
-	SDL_SetRenderDrawColor(renderer, (uint8_t)(r * 255.0), (uint8_t)(g * 255.0), (uint8_t)(b * 255.0), 255);
-	SDL_RenderDrawPoint(renderer, x, y);
+	constexpr int channels = 4;
+
+	// Convert 2d positions to 1d ofsset
+    PIN;
+	uint32_t offset = (y * pitch) + (x * sizeof(uint8_t) * channels);
+    PIN;
+	// Get a pointer to the first element in the array
+    PIN;
+	uint8_t* pointer = (uint8_t*)pixels;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	// ARGB
+	pointer[ offset + 0 ] = 255;
+	pointer[ offset + 1 ] = (uint8_t)(r * 255.0);
+	pointer[ offset + 2 ] = (uint8_t)(g * 255.0);
+	pointer[ offset + 3 ] = (uint8_t)(b * 255.0);
+#else
+	// BGRA
+    PIN;
+	pointer[ offset + 0 ] = (uint8_t)(b * 255.0);
+    PIN;
+	pointer[ offset + 1 ] = (uint8_t)(g * 255.0);
+    PIN;
+	pointer[ offset + 2 ] = (uint8_t)(r * 255.0);
+    PIN;
+	pointer[ offset + 3 ] = 255;
+#endif
 }
 
 inline void setPixel(int x, int y, Color color) {
@@ -35,11 +70,16 @@ inline void setPixel(int x, int y, Color color) {
 }
 
 inline void onFrame() {
+	// SDL_GL_GetDrawableSize(window, &width, &height);
+    // SDL_GetWindowSize(window, &width, &height);
+	width = surface->w;
+	height = surface->h;
+
 	float aspectRatio = float(width) / float(height);
-	SDL_GL_GetDrawableSize(window, &width, &height);
 
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
+            PIN;
 			// Calculate the UV coordinates [0.0 to 1.0]
 			float u = (float(x) / float(width)) * 2.0f - 1.0f;
 			float v = (float(y) / float(height)) * 2.0f - 1.0f;
@@ -122,29 +162,39 @@ int main() {
 
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		std::cout << "SDL could not initialize! " << SDL_GetError() << std::endl;
-		return -1;
+		SDL_HandleError("SDL could not initialize!");
 	}
 
 	// Create window
-	window = SDL_CreateWindow(
-		"Raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_ALLOW_HIGHDPI
-	);
+	int flags = SDL_WINDOW_SHOWN;
+
+#ifdef ENABLE_HIGHDPI
+	flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+#endif
+
+	window = SDL_CreateWindow("Raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 	if (window == nullptr) {
-		std::cout << "SDL could not create a Window! " << SDL_GetError() << std::endl;
-		return -1;
+		SDL_HandleError("SDL could not create a Window!");
+	}
+
+	// Create the renderer
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (renderer == nullptr) {
+		SDL_HandleError("SDL could not create a Renderer!");
 	}
 
 	// Size the window
-	// SDL_SetWindowSize(window, width, height);
-	// SDL_GetWindowSize(window, &width, &height);
 	SDL_GL_GetDrawableSize(window, &width, &height);
+	// Create the surface
+	surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+	if (surface == nullptr) {
+		SDL_HandleError("SDL could not create a Surface!");
+	}
 
-	// Create the renderer
-	renderer = SDL_CreateRenderer(window, -1, 0);
-	if (renderer == nullptr) {
-		std::cout << "SDL could not create a Renderer! " << SDL_GetError() << std::endl;
-		return -1;
+	// Create the texture
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	if (texture == nullptr) {
+		SDL_HandleError("SDL could not create a Texture!");
 	}
 
 	// Main loop
@@ -159,31 +209,34 @@ int main() {
 		// Handle mouse events
 		if (event.type == SDL_MOUSEMOTION) onMouseMove();
 
-		// Clears the screen
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-		SDL_RenderClear(renderer);
-
 		// Calculate the delta time
 		uint64_t currentFrameTime = SDL_GetPerformanceCounter();
 		deltaTime = ((currentFrameTime - lastFrameTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 		lastFrameTime = currentFrameTime;
 
 		// Paints the back buffer
-#ifdef DEBUG_FRAME_TIME
 		long start = SDL_GetTicks64();
-		onFrame();
-		std::cout << (SDL_GetTicks64() - start) << "ms" << std::endl;
-#else
-		onFrame();
-#endif
+
+		if (SDL_MUSTLOCK(surface)) SDL_LockTexture(texture, nullptr, &pixels, &pitch);
+        onFrame();
+		if (SDL_MUSTLOCK(surface)) SDL_UnlockTexture(texture);
 
 		// Display back buffer
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+		SDL_RenderClear(renderer);
 		SDL_RenderPresent(renderer);
+
+		std::cout << (SDL_GetTicks64() - start) << "ms" << std::endl;
 	}
 
+	std::cout << "Screen: " << surface->w << ", " << surface->h << std::endl;
+
 	// Free resources
-	SDL_DestroyRenderer(renderer);
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
 	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
 
 	// Quit
 	SDL_Quit();
