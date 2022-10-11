@@ -21,25 +21,26 @@ My intention is to register my learnings throughout this project in this reposit
 I had my experiments with Ray tracing before but never really got serious. I was able to achieve something similar with AssemblyScript compiling to WASM, but the performance wasn't really what I was expecting, which led me to try with native C++ and SDL.
 
 I started learning the basics of SDL, it has been a while since my last SDL project.
-<center>
+<p align="center">
     <img src=".github/day0.png">
     <small>Here's me rendering a gradient</small>
-</center>
+</p>
 
 ---
 ### Day 1
 After a few side projects in SDL, it's time to start ray tracing!
 
-<center>
+<p align="center">
     <img src=".github/day1.png">
     <small>Some HighDPI/Retina enabled rendering</small>
-<center>
-</center>
-    <br><br><br><br>
-    <img src=".github/day1.gif">
+</p>
+<br><br>
+<p align="center">
+    <img src=".github/day1.gif" style="display: block">
+    <br><br>
     <small>And some really cool realtime 120fps interaction</small>
-    <br><br><br><br>
-</center>
+</p>
+<br><br>
 
 This was basically the first day. Where I got some basic ray casting working.
 
